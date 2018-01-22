@@ -129,7 +129,7 @@ def mobilenet_feature_maps(batch_size=1):
         'post_processing_fn': post_process_fn,
     }
 
-def get_model_fn(model_name, batch_size=1):
+def caffe_get_model_fn(model_name, batch_size=1):
     if model_name == 'mobilenet':
         return mobilenet(batch_size)
     elif model_name == 'mobilenet_feature_maps':

@@ -302,7 +302,7 @@ def yolo_v2_detection_labels(batch_size=1):
 #     "output_processing_fns": list of output processing functions
 #     "session_feed_dict_fn": function that generates feed_dict given \
 #                             input_tensors and input_cols
-def get_model_fn(model_name, batch_size=1):
+def tf_get_model_fn(model_name, batch_size=1):
     if model_name == 'mobilenet_v1_224':
         return mobilenet_v1_224(batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco':

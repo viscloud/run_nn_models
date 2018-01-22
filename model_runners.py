@@ -1,8 +1,8 @@
 import caffe
 import numpy as np
 import tensorflow as tf
-from caffe_models import get_model_fn
-from tf_models import get_model_fn
+from caffe_models import caffe_get_model_fn
+from tf_models import tf_get_model_fn
 
 def get_tensors_by_name(graph, tensor_names):
     return \
@@ -22,7 +22,8 @@ class CaffeModelRunner(ModelRunner):
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.batch_size = batch_size
-        self.model_dict = get_model_fn(model_name, batch_size=self.batch_size)
+        self.model_dict = \
+            caffe_get_model_fn(model_name, batch_size=self.batch_size)
 
         caffe.set_mode_gpu()
         caffe.set_device(0)
@@ -47,7 +48,8 @@ class CaffeModelRunner(ModelRunner):
 class TensorflowModelRunner(ModelRunner):
     def __init__(self, model_name, batch_size):
         self.batch_size = batch_size
-        self.model_dict = get_model_fn(model_name, batch_size=self.batch_size)
+        self.model_dict = \
+            tf_get_model_fn(model_name, batch_size=self.batch_size)
 
         mode = self.model_dict['mode']
         checkpoint_path = self.model_dict['checkpoint_path']
