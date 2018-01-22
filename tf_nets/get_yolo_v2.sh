@@ -23,7 +23,7 @@ prog() {
 
     cd $CWD
 
-    cp -r tf_nets/YAD2K/yad2k projects/
+    cp -r tf_nets/YAD2K/yad2k ./
 }
 
 if [[ "$DIR" != "run_nn_models" ]] && [[ "$1" != "-f" ]];

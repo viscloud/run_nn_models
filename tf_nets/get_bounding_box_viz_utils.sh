@@ -6,13 +6,13 @@ DIR=`basename $CWD`
 prog() {
     git submodule update --init models
 
-    if [ ! -d projects/utils ]; then
-        mkdir projects/utils
+    if [ ! -d utils ]; then
+        mkdir utils
     fi
-    if [ ! -f projects/utils/__init__.py ]; then
-        touch projects/utils/__init__.py
+    if [ ! -f utils/__init__.py ]; then
+        touch utils/__init__.py
     fi
-    cp models/research/object_detection/utils/visualization_utils.py projects/utils
+    cp models/research/object_detection/utils/visualization_utils.py utils
 }
 
 if [[ "$DIR" != "run_nn_models" ]] && [[ "$1" != "-f" ]];
