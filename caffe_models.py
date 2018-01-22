@@ -65,7 +65,7 @@ def mobilenet(batch_size=1):
         outputs = np.squeeze(outputs)
         return [outputs]
 
-    def post_process_fn(input_columns, outputs):
+    def post_process_fn(input_columns, outputs, tf_sess=None):
         num_outputs = len(input_columns)
         serialize_fn = lambda x: np.ndarray.dumps(x.squeeze())
         return [[serialize_fn(outputs[0][i]) for i in range(num_outputs)]]
