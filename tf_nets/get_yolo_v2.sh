@@ -26,9 +26,9 @@ prog() {
     cp -r tf_nets/YAD2K/yad2k projects/
 }
 
-if [[ "$DIR" != "run-nn-models" ]] && [[ "$1" != "-f" ]];
+if [[ "$DIR" != "run_nn_models" ]] && [[ "$1" != "-f" ]];
 then
-    echo "Warning: you must run this script from the run-nn-models repo root, and I don't think you are."
+    echo "Warning: you must run this script from the run_nn_models repo root, and I don't think you are."
     echo "Run this again with -f if you're sure."
 else
     prog
