@@ -17,13 +17,16 @@ class ModelRunner(object):
 
 
 class CaffeModelRunner(ModelRunner):
-    def __init__(self, model_name, batch_size):
+    def __init__(self, model_name, batch_size, model_dict=None):
         # TF session for optional TF evaluation (e.g. fast GPU resizing).
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.batch_size = batch_size
-        self.model_dict = \
-            caffe_get_model_fn(model_name, batch_size=self.batch_size)
+        if model_dict is not None:
+            self.model_dict = model_dict
+        else:
+            self.model_dict = \
+                caffe_get_model_fn(model_name, batch_size=self.batch_size)
 
         caffe.set_mode_gpu()
         caffe.set_device(0)
@@ -46,10 +49,13 @@ class CaffeModelRunner(ModelRunner):
 
 
 class TensorflowModelRunner(ModelRunner):
-    def __init__(self, model_name, batch_size):
+    def __init__(self, model_name, batch_size, model_dict=None):
         self.batch_size = batch_size
-        self.model_dict = \
-            tf_get_model_fn(model_name, batch_size=self.batch_size)
+        if model_dict is not None:
+            self.model_dict = model_dict
+        else:
+            self.model_dict = \
+                tf_get_model_fn(model_name, batch_size=self.batch_size)
 
         mode = self.model_dict['mode']
         checkpoint_path = self.model_dict['checkpoint_path']
