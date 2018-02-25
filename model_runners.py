@@ -17,7 +17,7 @@ class ModelRunner(object):
 
 
 class CaffeModelRunner(ModelRunner):
-    def __init__(self, model_name, batch_size, model_dict=None):
+    def __init__(self, model_name, batch_size, model_dict=None, gpu_id=0):
         # TF session for optional TF evaluation (e.g. fast GPU resizing).
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
@@ -29,7 +29,7 @@ class CaffeModelRunner(ModelRunner):
                 caffe_get_model_fn(model_name, batch_size=self.batch_size)
 
         caffe.set_mode_gpu()
-        caffe.set_device(0)
+        caffe.set_device(gpu_id)
 
         self.image_width, self.image_height = self.model_dict['input_dims']
         self.model_path = self.model_dict['model_prototxt_path']
