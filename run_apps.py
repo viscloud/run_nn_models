@@ -33,4 +33,4 @@ for i in range(0, num_frames, batch_size):
         hdf5_file = h5py.File(output_dir + '/feature_vectors.npy', mode='w')
         hdf5_file.create_dataset(
             'data', [num_frames] + list(outputs.shape[1:]), 'f4')
-    hdf5_file['data'][start:end] = np.vstack(output_buffer)
+    hdf5_file['data'][start:end] = outputs
