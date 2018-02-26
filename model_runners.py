@@ -49,7 +49,7 @@ class CaffeModelRunner(ModelRunner):
 
 
 class TensorflowModelRunner(ModelRunner):
-    def __init__(self, model_name, batch_size, model_dict=None):
+    def __init__(self, model_name, batch_size, model_dict=None, gpus=None):
         self.batch_size = batch_size
         if model_dict is not None:
             self.model_dict = model_dict
@@ -61,7 +61,12 @@ class TensorflowModelRunner(ModelRunner):
         checkpoint_path = self.model_dict['checkpoint_path']
         input_tensors = self.model_dict['input_tensors']
         output_tensors = self.model_dict['output_tensors']
-        sess_config = tf.ConfigProto(log_device_placement=True)
+        if gpus is not None:
+            gpu_options = tf.GPUOptions(visible_device_list=gpus)
+            sess_config = tf.ConfigProto(log_device_placement=True,
+                                         gpu_options=gpu_options)
+        else:
+            sess_config = tf.ConfigProto(log_device_placement=True)
 
         # NOTE: Batching is only allowed in python mode because frozen graphs
         #       cannot be modified.
