@@ -13,7 +13,7 @@ prog() {
 
     cd $CWD
 
-    cp models/research/slim/nets/mobilenet_v1.py projects/
+    cp models/research/slim/nets/mobilenet_v1.py ./
 }
 
 if [[ "$DIR" != "run_nn_models" ]] && [[ "$1" != "-f" ]];
