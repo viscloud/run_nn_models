@@ -295,6 +295,38 @@ def yolo_v2_detection_labels(batch_size=1):
         'model_init_fn': yolo_v2_model(model_path, batch_size)
     }
         
+def vgg_16(batch_size=1):
+    input_imgs = tf.placeholder('uint8', [None, None, None, 3], name='imgs')
+    resized_imgs = tf.image.resize_images(
+        tf.cast(input_imgs, tf.float32), [224, 224]) - [123.68, 116.78, 103.94]
+
+    def pre_process_fn(input_columns, batch_size):
+        batched_inputs = input_pre_process_fn(input_columns, batch_size)
+        return batched_inputs
+
+    def post_process_fn(input_columns, outputs):
+        num_outputs = len(input_columns)
+        serialize_fn = lambda x: np.ndarray.dumps(x.squeeze().flatten())
+        return [[serialize_fn(outputs[0][i]) for i in range(num_outputs)]]
+
+    def model_init_fn(K):
+        vgg_model = tf.keras.applications.VGG16()
+        K.get_session().run(tf.global_variables_initializer())
+
+    return {
+        'mode': 'keras',
+        'checkpoint_path': None,
+        'input_tensors': ['input_1:0'],
+        'output_tensors': ['fc2/Relu:0'],
+        'post_processing_fn': post_process_fn,
+        'session_feed_dict_fn': lambda sess, input_tensors, cols: \
+            {input_tensors[0]:
+                 sess.run(resized_imgs, feed_dict={
+                     input_imgs: pre_process_fn(cols, batch_size)}),
+            },
+        'model_init_fn': model_init_fn,
+    }
+
 # This should return a dictionary with the following items:
 #     "checkpoint_path": directory containing frozen_inference_graph.pb
 #     "input_tensors": list of names of input tensors
@@ -317,5 +349,7 @@ def tf_get_model_fn(model_name, batch_size=1):
         return yolo_v2(batch_size)
     elif model_name == 'yolo_v2_detection_labels':
         return yolo_v2_detection_labels(batch_size)
+    elif model_name == 'vgg_16':
+        return vgg_16(batch_size)
     else:
         raise Exception("Could not find network with name %s" % model_name)
