@@ -42,7 +42,7 @@ def mobilenet_v1_224(batch_size=1):
                      is_training=False, global_pool=True)
 
     def post_process_fn(input_columns, outputs):
-        num_outputs = len(input_columns)
+        num_outputs = len(input_columns[0])
         serialize_fn = lambda x: np.ndarray.dumps(x.squeeze())
         return [[serialize_fn(outputs[0][i]) for i in range(num_outputs)]]
 
@@ -79,7 +79,7 @@ def draw_tf_bounding_boxes(
 
 def ssd_mobilenet_v1_coco_feature_extractor(batch_size=1):
     def post_process_fn(input_columns, outputs):
-        num_outputs = len(input_columns)
+        num_outputs = len(input_columns[0])
         serialize_fn = lambda x: np.ndarray.dumps(x.squeeze().flatten())
         return [[serialize_fn(outputs[0][i]) for i in range(num_outputs)]]
 
@@ -305,7 +305,7 @@ def vgg_16(batch_size=1):
         return batched_inputs
 
     def post_process_fn(input_columns, outputs):
-        num_outputs = len(input_columns)
+        num_outputs = len(input_columns[0])
         serialize_fn = lambda x: np.ndarray.dumps(x.squeeze().flatten())
         return [[serialize_fn(outputs[0][i]) for i in range(num_outputs)]]
 
