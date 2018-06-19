@@ -6,3 +6,6 @@
 	path = tf_nets/YAD2K
 	url = https://github.com/giulio-zhou/YAD2K.git
 	branch = master
+[submodule "modules/stn"]
+	path = modules/stn
+	url = https://github.com/kevinzakka/spatial-transformer-network
