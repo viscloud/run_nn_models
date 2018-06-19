@@ -8,4 +8,4 @@
 	branch = master
 [submodule "modules/stn"]
 	path = modules/stn
-	url = https://github.com/kevinzakka/spatial-transformer-network
+	url = https://github.com/giulio-zhou/spatial-transformer-network
