@@ -6,11 +6,11 @@ DIR=`basename $CWD`
 prog() {
     cd tf_nets
 
-    wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_11_06_2017.tar.gz
-    tar -xvf ssd_mobilenet_v1_coco_11_06_2017.tar.gz
+    wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2017_11_17.tar.gz
+    tar -xvf ssd_mobilenet_v1_coco_2017_11_17.tar.gz
 
-    rm ssd_mobilenet_v1_coco_11_06_2017.tar.gz
-    mv ssd_mobilenet_v1_coco_11_06_2017 ssd_mobilenet_v1_coco
+    rm ssd_mobilenet_v1_coco_2017_11_17.tar.gz
+    mv ssd_mobilenet_v1_coco_2017_11_17 ssd_mobilenet_v1_coco
 
     cd $CWD
 

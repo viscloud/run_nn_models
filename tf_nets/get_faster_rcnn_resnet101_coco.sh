@@ -6,11 +6,11 @@ DIR=`basename $CWD`
 prog() {
     cd tf_nets
 
-    wget http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz
-    tar -xvf faster_rcnn_resnet101_coco_11_06_2017.tar.gz
+    wget http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_2018_01_28.tar.gz
+    tar -xvf faster_rcnn_resnet101_coco_2018_01_28.tar.gz
 
-    rm faster_rcnn_resnet101_coco_11_06_2017.tar.gz
-    mv faster_rcnn_resnet101_coco_11_06_2017 faster_rcnn_resnet101_coco
+    rm faster_rcnn_resnet101_coco_2018_01_28.tar.gz
+    mv faster_rcnn_resnet101_coco_2018_01_28 faster_rcnn_resnet101_coco
 
     cd $CWD
 
