@@ -77,6 +77,23 @@ def draw_tf_bounding_boxes(
         min_score_thresh=0.3)
     return image_np
 
+def post_process_tf_objdet_bboxes(inputs, outputs, score_threshold=0.3):
+    from constants import coco_class_ids_to_names as class_ids_to_names
+    output_annotations = []
+    all_boxes, all_scores, all_classes, num_detections = outputs
+    all_classes = all_classes.astype(np.int32)
+    for i in range(len(inputs[0])):
+        output_npy = []
+        boxes, scores, classes = all_boxes[i], all_scores[i], all_classes[i]
+        for j in range(len(boxes)):
+            if scores[j] < score_threshold: continue
+            entry = \
+                [class_ids_to_names[classes[j]], scores[j]] + list(boxes[j])
+            output_npy.append(entry)
+        output_npy = np.array(output_npy)
+        output_annotations.append(np.ndarray.dumps(output_npy))
+    return [output_annotations]
+
 def ssd_mobilenet_v1_coco_feature_extractor(batch_size=1):
     def post_process_fn(input_columns, outputs):
         num_outputs = len(input_columns[0])
@@ -169,6 +186,19 @@ def faster_rcnn_resnet101_coco(batch_size=1):
         'output_tensors': ['detection_boxes:0', 'detection_scores:0',
                            'detection_classes:0', 'num_detections:0'],
         'post_processing_fn': post_process_fn,
+        'session_feed_dict_fn': \
+            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
+    }
+
+def faster_rcnn_resnet101_coco_detection_labels(batch_size=1):
+    return {
+        'mode': 'frozen_graph',
+        'checkpoint_path': get_frozen_graph_path('faster_rcnn_resnet101_coco'),
+        'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
+        'input_tensors': ['image_tensor:0'],
+        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
+                           'detection_classes:0', 'num_detections:0'],
+        'post_processing_fn': post_process_tf_objdet_bboxes,
         'session_feed_dict_fn': \
             lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
     }
@@ -345,6 +375,8 @@ def tf_get_model_fn(model_name, batch_size=1):
         return ssd_mobilenet_v1_coco_feature_extractor(batch_size)
     elif model_name == 'faster_rcnn_resnet101_coco':
         return faster_rcnn_resnet101_coco(batch_size)
+    elif model_name == 'faster_rcnn_resnet101_coco_detection_labels':
+        return faster_rcnn_resnet101_coco_detection_labels(batch_size)
     elif model_name == 'yolo_v2':
         return yolo_v2(batch_size)
     elif model_name == 'yolo_v2_detection_labels':
