@@ -279,7 +279,7 @@ def yolo_v2_detection_labels(batch_size=1):
     return {
         'mode': 'keras',
         'checkpoint_path': model_path,
-        'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
+        'header': ['object_name', 'confidence', 'ymin', 'xmin', 'ymax', 'xmax'],
         'input_tensors': \
             ['input_1:0', 'Placeholder_112:0', # input_image_shape
              'batch_normalization_1/keras_learning_phase:0'],
