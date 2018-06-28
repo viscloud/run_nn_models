@@ -206,6 +206,7 @@ def faster_rcnn_resnet101_coco_detection_labels(batch_size=1):
 def yolo_v2_model(model_path, batch_size=1):
     def create_yolo_v2_model(K):
         score_threshold, iou_threshold = 0.3, 0.5
+        max_boxes = 50
         from keras.models import load_model
         from constants import coco_classes as class_names
         from constants import yolo_anchors as anchors
@@ -245,6 +246,9 @@ def yolo_v2(batch_size=1):
             idx = np.where(all_frames == i)
             boxes, scores, classes = \
                 all_boxes[idx], all_scores[idx], all_classes[idx]
+            # Renormalize X coordinates when width > height.
+            boxes[:, 1] *= float(model_height) / model_width
+            boxes[:, 3] *= float(model_height) / model_width
             # Pad boxes, scores, classes if necessary
             if len(boxes) == 1:
                 boxes = np.vstack([boxes, np.zeros((1, 4))])
@@ -298,6 +302,9 @@ def yolo_v2_detection_labels(batch_size=1):
             idx = np.where(all_frames == i)
             boxes, scores, classes = \
                 all_boxes[idx], all_scores[idx], all_classes[idx]
+            # Renormalize X coordinates when width > height.
+            boxes[:, 1] *= float(model_height) / model_width
+            boxes[:, 3] *= float(model_height) / model_width
             for j in range(len(boxes)):
                 entry = \
                     [class_ids_to_names[classes[j]], scores[j]] + list(boxes[j])
