@@ -94,6 +94,19 @@ def post_process_tf_objdet_bboxes(inputs, outputs, score_threshold=0.3):
         output_annotations.append(np.ndarray.dumps(output_npy))
     return [output_annotations]
 
+def ssd_inception_v2_coco_detection_labels(batch_size=1):
+    return {
+        'mode': 'frozen_graph',
+        'checkpoint_path': get_frozen_graph_path('ssd_inception_v2_coco'),
+        'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
+        'input_tensors': ['image_tensor:0'],
+        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
+                           'detection_classes:0', 'num_detections:0'],
+        'post_processing_fn': post_process_tf_objdet_bboxes,
+        'session_feed_dict_fn': \
+            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
+    }
+
 def ssd_mobilenet_v1_coco_feature_extractor(batch_size=1):
     def post_process_fn(input_columns, outputs):
         num_outputs = len(input_columns[0])
@@ -374,6 +387,8 @@ def vgg_16(batch_size=1):
 def tf_get_model_fn(model_name, batch_size=1):
     if model_name == 'mobilenet_v1_224':
         return mobilenet_v1_224(batch_size)
+    elif model_name == 'ssd_inception_v2_coco_detection_labels':
+        return ssd_inception_v2_coco_detection_labels(batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco':
         return ssd_mobilenet_v1_coco(batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco_detection_features':
