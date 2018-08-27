@@ -94,15 +94,41 @@ def post_process_tf_objdet_bboxes(inputs, outputs, score_threshold=0.3):
         output_annotations.append(np.ndarray.dumps(output_npy))
     return [output_annotations]
 
-def ssd_inception_v2_coco_detection_labels(batch_size=1):
+def draw_tf_objdet_bboxes(inputs, outputs):
+    from constants import coco_class_ids_to_names as class_ids_to_names
+    all_boxes, all_scores, all_classes, all_num_detections = outputs
+    output_imgs = []
+    for i in range(len(inputs[0])):
+        image_np = inputs[0][i]
+        boxes, scores, classes = all_boxes[i], all_scores[i], all_classes[i]
+        num_detections = all_num_detections[i]
+        image_np = draw_tf_bounding_boxes(
+            image_np, boxes, scores, classes,
+            num_detections, class_ids_to_names)
+        image_np = img_as_ubyte(image_np)
+    return [output_imgs]
+
+def tf_detection_labels(model_name, batch_size=1):
     return {
         'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path('ssd_inception_v2_coco'),
+        'checkpoint_path': get_frozen_graph_path(model_name),
         'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
         'input_tensors': ['image_tensor:0'],
         'output_tensors': ['detection_boxes:0', 'detection_scores:0',
                            'detection_classes:0', 'num_detections:0'],
         'post_processing_fn': post_process_tf_objdet_bboxes,
+        'session_feed_dict_fn': \
+            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
+    }
+
+def tf_draw_bboxes(model_name, batch_size=1):
+    return {
+        'mode': 'frozen_graph',
+        'checkpoint_path': get_frozen_graph_path(model_name),
+        'input_tensors': ['image_tensor:0'],
+        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
+                           'detection_classes:0', 'num_detections:0'],
+        'post_processing_fn': draw_tf_objdet_bboxes,
         'session_feed_dict_fn': \
             lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
     }
@@ -155,63 +181,6 @@ def ssd_mobilenet_v1_coco_detection_features(batch_size=1):
         'output_tensors': ['detection_boxes:0', 'detection_scores:0',
                            'detection_classes:0', 'num_detections:0'],
         'post_processing_fn': post_process_fn,
-        'session_feed_dict_fn': \
-            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
-    }
-
-def ssd_mobilenet_v1_coco(batch_size=1):
-    def post_process_fn(inputs, outputs):
-        from constants import coco_class_ids_to_names
-        image_np = inputs[0][0]
-        boxes, scores, classes, num_detections = outputs
-        image_np = draw_tf_bounding_boxes(
-            image_np, boxes, scores, classes,
-            num_detections, class_ids_to_names)
-        image_np = img_as_ubyte(image_np)
-        return [[image_np]]
-
-    return {
-        'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path('ssd_mobilenet_v1_coco'),
-        'input_tensors': ['image_tensor:0'],
-        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
-                           'detection_classes:0', 'num_detections:0'],
-        'post_processing_fn': post_process_fn,
-        'session_feed_dict_fn': \
-            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
-    }
-
-def faster_rcnn_resnet101_coco(batch_size=1):
-    def post_process_fn(inputs, outputs):
-        from constants import coco_class_ids_to_names
-        image_np = inputs[0][0]
-        boxes, scores, classes, num_detections = outputs
-        image_np = draw_tf_bounding_boxes(
-            image_np, boxes, scores, classes,
-            num_detections, class_ids_to_names)
-        image_np = img_as_ubyte(image_np)
-        return [[image_np]]
-
-    return {
-        'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path('faster_rcnn_resnet101_coco'),
-        'input_tensors': ['image_tensor:0'],
-        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
-                           'detection_classes:0', 'num_detections:0'],
-        'post_processing_fn': post_process_fn,
-        'session_feed_dict_fn': \
-            lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
-    }
-
-def faster_rcnn_resnet101_coco_detection_labels(batch_size=1):
-    return {
-        'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path('faster_rcnn_resnet101_coco'),
-        'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
-        'input_tensors': ['image_tensor:0'],
-        'output_tensors': ['detection_boxes:0', 'detection_scores:0',
-                           'detection_classes:0', 'num_detections:0'],
-        'post_processing_fn': post_process_tf_objdet_bboxes,
         'session_feed_dict_fn': \
             lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
     }
@@ -387,18 +356,18 @@ def vgg_16(batch_size=1):
 def tf_get_model_fn(model_name, batch_size=1):
     if model_name == 'mobilenet_v1_224':
         return mobilenet_v1_224(batch_size)
-    elif model_name == 'ssd_inception_v2_coco_detection_labels':
-        return ssd_inception_v2_coco_detection_labels(batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco':
-        return ssd_mobilenet_v1_coco(batch_size)
+        return tf_draw_bboxes('ssd_mobilenet_v1_coco', batch_size)
+    elif model_name == 'faster_rcnn_resnet101_coco':
+        return tf_draw_bboxes('faster_rcnn_resnet101_coco', batch_size)
+    elif model_name == 'ssd_inception_v2_coco_detection_labels':
+        return tf_detection_labels('ssd_inception_v2_coco', batch_size)
+    elif model_name == 'faster_rcnn_resnet101_coco_detection_labels':
+        return tf_detection_labels('faster_rcnn_resnet101_coco', batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco_detection_features':
         return ssd_mobilenet_v1_coco_detection_features(batch_size)
     elif model_name == 'ssd_mobilenet_v1_coco_feature_extractor':
         return ssd_mobilenet_v1_coco_feature_extractor(batch_size)
-    elif model_name == 'faster_rcnn_resnet101_coco':
-        return faster_rcnn_resnet101_coco(batch_size)
-    elif model_name == 'faster_rcnn_resnet101_coco_detection_labels':
-        return faster_rcnn_resnet101_coco_detection_labels(batch_size)
     elif model_name == 'yolo_v2':
         return yolo_v2(batch_size)
     elif model_name == 'yolo_v2_detection_labels':
