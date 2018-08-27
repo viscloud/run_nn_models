@@ -108,10 +108,11 @@ def draw_tf_objdet_bboxes(inputs, outputs):
         image_np = img_as_ubyte(image_np)
     return [output_imgs]
 
-def tf_detection_labels(model_name, batch_size=1):
+def tf_detection_labels(model_name, batch_size=1,
+                        ckpt_path_fn=get_frozen_graph_path):
     return {
         'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path(model_name),
+        'checkpoint_path': ckpt_path_fn(model_name),
         'header': ['object_name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax'],
         'input_tensors': ['image_tensor:0'],
         'output_tensors': ['detection_boxes:0', 'detection_scores:0',
@@ -121,10 +122,11 @@ def tf_detection_labels(model_name, batch_size=1):
             lambda sess, input_tensors, cols: {input_tensors[0]: cols[0]}
     }
 
-def tf_draw_bboxes(model_name, batch_size=1):
+def tf_draw_bboxes(model_name, batch_size=1,
+                   ckpt_path_fn=get_frozen_graph_path):
     return {
         'mode': 'frozen_graph',
-        'checkpoint_path': get_frozen_graph_path(model_name),
+        'checkpoint_path': ckpt_path_fn(model_name),
         'input_tensors': ['image_tensor:0'],
         'output_tensors': ['detection_boxes:0', 'detection_scores:0',
                            'detection_classes:0', 'num_detections:0'],
