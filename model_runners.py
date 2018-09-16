@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from caffe_models import caffe_get_model_fn
 from tf_models import tf_get_model_fn
+import time
 
 def get_tensors_by_name(graph, tensor_names):
     return \
@@ -19,9 +20,10 @@ class ModelRunner(object):
 class CaffeModelRunner(ModelRunner):
     def __init__(self, model_name, batch_size, model_dict=None, gpu_id=0):
         # TF session for optional TF evaluation (e.g. fast GPU resizing).
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+        gpu_options = tf.GPUOptions(allow_growth=True)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         self.batch_size = batch_size
+        self.gpu_id = gpu_id
         if model_dict is not None:
             self.model_dict = model_dict
         else:
@@ -29,7 +31,7 @@ class CaffeModelRunner(ModelRunner):
                 caffe_get_model_fn(model_name, batch_size=self.batch_size)
 
         caffe.set_mode_gpu()
-        caffe.set_device(gpu_id)
+        caffe.set_device(self.gpu_id)
 
         self.image_width, self.image_height = self.model_dict['input_dims']
         self.model_path = self.model_dict['model_prototxt_path']
@@ -40,6 +42,8 @@ class CaffeModelRunner(ModelRunner):
             self.batch_size, 3, self.image_height, self.image_width)
 
     def execute(self, input_columns):
+        caffe.set_mode_gpu()
+        caffe.set_device(self.gpu_id)
         inputs = \
             self.model_dict['input_preprocess_fn'](self.sess, input_columns)
         outputs = self.model_dict['inference_fn'](self.model, inputs)
