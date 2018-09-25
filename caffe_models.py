@@ -4,7 +4,7 @@ import tensorflow as tf
 from skimage.transform import resize
 
 def input_pre_process_fn(input_columns, batch_size):
-    cols = input_columns[0]
+    cols = input_columns
     if len(cols) < batch_size:
         padding = [cols[0]] * (batch_size - len(cols))
         inputs = np.array(cols + padding)
