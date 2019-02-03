@@ -47,7 +47,7 @@ class CaffeModelRunner(ModelRunner):
             self.model_dict['input_preprocess_fn'](self.sess, input_columns)
         outputs = self.model_dict['inference_fn'](self.model, inputs)
         post_processed_outputs = self.model_dict['post_processing_fn'](
-            input_columns, outputs, self.sess)
+            input_columns, outputs)
         return post_processed_outputs
 
 
