@@ -4,6 +4,12 @@ import tensorflow as tf
 from caffe_models import caffe_get_model_fn
 from tf_models import tf_get_model_fn
 
+VRB = False
+
+def log(s):
+    if VRB:
+        print(s)
+
 def get_tensors_by_name(graph, tensor_names):
     return \
         [graph.get_tensor_by_name(tensor_name) for tensor_name in tensor_names]
@@ -41,6 +47,7 @@ class CaffeModelRunner(ModelRunner):
             self.batch_size, 3, self.image_height, self.image_width)
 
     def execute(self, input_columns):
+        log("Enter CMR execute")
         caffe.set_mode_gpu()
         caffe.set_device(self.gpu_id)
         inputs = \
@@ -48,6 +55,7 @@ class CaffeModelRunner(ModelRunner):
         outputs = self.model_dict['inference_fn'](self.model, inputs)
         post_processed_outputs = self.model_dict['post_processing_fn'](
             input_columns, outputs)
+        log("Exit CMR execute")
         return post_processed_outputs
 
 
