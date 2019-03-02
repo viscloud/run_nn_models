@@ -37,6 +37,7 @@ class CaffeModelRunner(ModelRunner):
 
         caffe.set_mode_gpu()
         caffe.set_device(self.gpu_id)
+        log("Caffe GPU id: {}".format(self.gpu_id))
 
         self.image_width, self.image_height = self.model_dict['input_dims']
         self.model_path = self.model_dict['model_prototxt_path']
@@ -50,6 +51,8 @@ class CaffeModelRunner(ModelRunner):
         log("Enter CMR execute")
         caffe.set_mode_gpu()
         caffe.set_device(self.gpu_id)
+        log("Caffe GPU id: {}".format(self.gpu_id))
+
         inputs = \
             self.model_dict['input_preprocess_fn'](self.sess, input_columns)
         outputs = self.model_dict['inference_fn'](self.model, inputs)
