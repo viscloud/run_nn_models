@@ -1,18 +1,23 @@
+
 import caffe
 import numpy as np
 import tensorflow as tf
-from caffe_models import caffe_get_model_fn
-from tf_models import tf_get_model_fn
 
-VRB = False
+import caffe_models
+import tf_models
+
+VRB = True
+
 
 def log(s):
     if VRB:
         print(s)
 
+
 def get_tensors_by_name(graph, tensor_names):
     return \
         [graph.get_tensor_by_name(tensor_name) for tensor_name in tensor_names]
+
 
 # The input_columns format expects a batch (size B) of N "columns". This is
 # provided as a length N list of B-lengthed list containing entries of each
@@ -32,8 +37,8 @@ class CaffeModelRunner(ModelRunner):
         if model_dict is not None:
             self.model_dict = model_dict
         else:
-            self.model_dict = \
-                caffe_get_model_fn(model_name, batch_size=self.batch_size)
+            self.model_dict = caffe_models.caffe_get_model_fn(
+                model_name, batch_size=self.batch_size)
 
         caffe.set_mode_gpu()
         caffe.set_device(self.gpu_id)
@@ -68,8 +73,8 @@ class TensorflowModelRunner(ModelRunner):
         if model_dict is not None:
             self.model_dict = model_dict
         else:
-            self.model_dict = \
-                tf_get_model_fn(model_name, batch_size=self.batch_size)
+            self.model_dict = tf_models.tf_get_model_fn(
+                model_name, batch_size=self.batch_size)
 
         mode = self.model_dict['mode']
         checkpoint_path = self.model_dict['checkpoint_path']

@@ -75,7 +75,7 @@ def mobilenet(batch_size=1):
         'model_weights_path': 'caffe_nets/mobilenet.caffemodel',
         'input_dims': [224, 224],
         'input_preprocess_fn': lambda sess, cols: sess.run(
-            normalized_inputs, 
+            normalized_inputs,
             feed_dict={input_imgs: input_pre_process_fn(cols, batch_size)}),
         'inference_fn': inference_fn,
         'post_processing_fn': post_process_fn,
@@ -93,7 +93,7 @@ def mobilenet_feature_maps(batch_size=1):
               "conv5_2/sep", "conv5_3/sep", "conv5_4/sep", "conv5_5/sep",
               "conv5_6/sep", "conv6/sep"]
     vis_weights = [1.0 for _ in range(12)] + [0.2, 5.0]
-    feature_map_tensors = [tf.placeholder('float32', [None, None, None, None], 
+    feature_map_tensors = [tf.placeholder('float32', [None, None, None, None],
                                           name=i) for i in layers]
     imgs_and_feature_maps = \
         create_feature_grid_tf(input_imgs, feature_map_tensors, vis_weights, 4)
@@ -123,16 +123,16 @@ def mobilenet_feature_maps(batch_size=1):
         'model_weights_path': 'caffe_nets/mobilenet.caffemodel',
         'input_dims': [224, 224],
         'input_preprocess_fn': lambda sess, cols: sess.run(
-            normalized_inputs, 
+            normalized_inputs,
             feed_dict={input_imgs: input_pre_process_fn(cols, batch_size)}),
         'inference_fn': inference_fn,
         'post_processing_fn': post_process_fn,
     }
 
 def caffe_get_model_fn(model_name, batch_size=1):
-    if model_name == 'mobilenet':
-        return mobilenet(batch_size)
-    elif model_name == 'mobilenet_feature_maps':
-        return mobilenet_feature_maps(batch_size)
-    else:
-        raise Exception("Could not find network with name %s" % model_name)
+   if model_name == 'mobilenet':
+       return mobilenet(batch_size)
+   elif model_name == 'mobilenet_feature_maps':
+       return mobilenet_feature_maps(batch_size)
+   else:
+       raise Exception("Could not find network with name %s" % model_name)
