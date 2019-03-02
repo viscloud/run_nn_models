@@ -6,7 +6,7 @@ import tensorflow as tf
 import caffe_models
 import tf_models
 
-VRB = True
+VRB = False
 
 
 def log(s):
